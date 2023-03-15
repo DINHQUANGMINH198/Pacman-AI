@@ -1,5 +1,6 @@
 from fringes import Queue, Stack, PriorityQueue
 
+# YC1-3:
 def bfs(problem):
     """
     Breadth-first search algorithm.
@@ -304,4 +305,38 @@ def astar(problem, fn_heuristic):
 '''
 The only difference between this implementation and the one in YC2-3 is that this implementation takes a problem parameter instead of a SingleFoodSearchProblem parameter,
 and the problem object has to implement the same methods as SingleFoodSearchProblem and MultiFoodSearchProblem. This allows the function to work with both types of problems.
+'''
+
+
+# YC2-5:
+def gbfs(problem, fn_heuristic):
+    """Perform greedy best-first search on the given problem using the given heuristic."""
+    frontier = util.PriorityQueue()  # Use a priority queue to keep track of the next states to visit
+    visited = set()  # Use a set to keep track of visited states
+    start_state = problem.getStartState()
+    frontier.push((start_state, []), fn_heuristic(start_state))  # Add the start state to the frontier with its heuristic value as the priority
+
+    while not frontier.isEmpty():
+        curr_state, path = frontier.pop()
+        if problem.isGoalState(curr_state):
+            return path
+        visited.add(curr_state)
+        for next_state, action, cost in problem.getSuccessors(curr_state):
+            if next_state not in visited:
+                frontier.push((next_state, path + [action]), fn_heuristic(next_state))
+    return []
+
+'''
+The function takes in a problem instance of SingleFoodSearchProblem or MultiFoodSearchProblem and a heuristic function fn_heuristic,
+and returns a list of actions that pacman can take to reach the goal state.
+
+The function starts by initializing an empty priority queue frontier to keep track of the states to visit,
+and a set visited to keep track of the visited states. It then adds the start state to the frontier with its heuristic value as the priority.
+
+In the while loop, the function repeatedly pops the state with the lowest heuristic value from the frontier,
+and checks if it is the goal state. If it is, the function returns the path to that state. 
+Otherwise, it adds the current state to the visited set, and generates the successors of the current state. For each successor, 
+if it has not been visited, the function adds it to the frontier with its heuristic value as the priority.
+
+If the frontier becomes empty, the function returns an empty list, indicating that no path to the goal state was found.
 '''

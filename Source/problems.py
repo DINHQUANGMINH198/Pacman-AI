@@ -1,3 +1,5 @@
+
+# YC1-1
 class SingleFoodSearchProblem:
     def __init__(self, maze_file):
         self.maze = self.read_maze(maze_file)
@@ -69,6 +71,34 @@ class SingleFoodSearchProblem:
         for line in self.maze:
             print(line)
             
+    # YC1-4:
+    '''
+        The animate() method takes in a list of actions, which represent the sequence of moves that pacman should make to reach the food.
+        It starts by setting the current position of pacman to the initial position, and then enters a loop that iterates over the actions. 
+        In each iteration, the method clears the screen, prints the maze (including the current position of pacman and the location of the food), waits for the user to press Enter, 
+        and then moves pacman to the next position according to the next action in the list. 
+        The time.sleep(0.5) call slows down the animation so that it is visible to the user.
+    '''
+    def animate(self, actions):
+        current = self.start
+        
+        while actions:
+            os.system('cls' if os.name == 'nt' else 'clear')
+            for row in range(len(self.maze)):
+                for col in range(len(self.maze[row])):
+                    if (row, col) == current:
+                        print('P', end=' ')
+                    elif (row, col) == self.food:
+                        print('.', end=' ')
+                    elif self.maze[row][col] == '%':
+                        print('%', end=' ')
+                    else:
+                        print(' ', end=' ')
+                print()
+            action = actions.pop(0)
+            current = (current[0] + self.actions[action][0], current[1] + self.actions[action][1])
+            time.sleep(0.5)
+            input('Press Enter to continue')      
 
     
 
@@ -106,7 +136,7 @@ In this implementation, we define the SingleFoodSearchProblem class, which repre
 
     path_cost(self, c, state1, action, state2): Returns the cost of the path from state1 to state2 via action, assuming a cost of c to get to state1
 '''
-
+# YC1-5:
 class MultiFoodSearchProblem:
     
     def __init__(self, maze_file):
@@ -161,7 +191,6 @@ class MultiFoodSearchProblem:
         if new_pos in food:
             new_food.remove(new_pos)
         return Node(new_pos, new_food)
-    
     def animate(self, actions):
         current = self.start
         food_left = len(self.food)
