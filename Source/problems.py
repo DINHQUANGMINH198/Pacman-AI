@@ -1,19 +1,43 @@
+import os 
+import time
 
+class Node:
+    def __init__(self, state, cost, last_path):
+        self.state = state 
+        self.cost = cost
+        self.path = [p for p in last_path] 
+        self.path.append(self.state)
+
+class Problem:
+    pass 
 # YC1-1
 class SingleFoodSearchProblem:
     def __init__(self, maze_file):
         self.maze = self.read_maze(maze_file)
-        self.start_state = self.get_start_state()
         self.goal_state = self.get_goal_state()
-
-    def get_start_state(self):
+    
+    def expand(self, node):
+        cur_i, cur_j = node.state
+        for i in [cur_i - 1, cur_i, cur_i + 1]:
+            for j in [cur_j - 1, cur_j, cur_j + 1]:
+                if i < 0 or j < 0:
+                    continue 
+                if (i, j) == (cur_i, cur_j):
+                    continue
+                
+                if self.maze[i][j] in [' ', '.']:
+                
+                    yield Node((i, j), node.cost + 1, node.path)
+        
+        
+    def initial_state(self):
         """
         Returns the start state of the problem, which is the location of Pacman.
         """
         for i in range(len(self.maze)):
             for j in range(len(self.maze[0])):
                 if self.maze[i][j] == 'P':
-                    return (i, j)
+                    return Node((i, j), 0, [])
 
     def get_goal_state(self):
         """
@@ -24,7 +48,7 @@ class SingleFoodSearchProblem:
                 if self.maze[i][j] == '.':
                     return (i, j)
 
-    def is_goal_state(self, state):
+    def goal_test(self, state):
         """
         Returns True if the given state is the goal state of the problem.
         """
@@ -80,23 +104,21 @@ class SingleFoodSearchProblem:
         The time.sleep(0.5) call slows down the animation so that it is visible to the user.
     '''
     def animate(self, actions):
-        current = self.start
+        current = self.initial_state().state
+        init_pos = current
         
         while actions:
             os.system('cls' if os.name == 'nt' else 'clear')
             for row in range(len(self.maze)):
                 for col in range(len(self.maze[row])):
                     if (row, col) == current:
-                        print('P', end=' ')
-                    elif (row, col) == self.food:
-                        print('.', end=' ')
-                    elif self.maze[row][col] == '%':
-                        print('%', end=' ')
+                        print('P', end='')
+                    elif (row, col) == init_pos:
+                        print(end = ' ')                        
                     else:
-                        print(' ', end=' ')
+                        print(self.maze[row][col], end = '')
                 print()
-            action = actions.pop(0)
-            current = (current[0] + self.actions[action][0], current[1] + self.actions[action][1])
+            current = actions.pop(0)
             time.sleep(0.5)
             input('Press Enter to continue')      
 
@@ -169,7 +191,7 @@ class MultiFoodSearchProblem:
         return Node(self.start, self.food)
     
     def goal_test(self, node):
-        return len(node.state()[1]) == 0
+        return len(node.state[1]) == 0
     
     def path_cost(self, c, state1, action, state2):
         return c + 1

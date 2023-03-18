@@ -1,5 +1,6 @@
-from fringes import Queue, Stack, PriorityQueue
-
+from .fringes import Queue, Stack, PriorityQueue
+from .problems import Node
+import math
 # YC1-3:
 def bfs(problem):
     """
@@ -8,19 +9,22 @@ def bfs(problem):
     node = problem.initial_state()
     frontier = Queue()
     frontier.enqueue(node)
+    frontier_states = Queue()
+    frontier_states.enqueue(node.state)
     explored = set()
     
     while not frontier.is_empty():
         node = frontier.dequeue()
         
-        if problem.goal_test(node):
-            return node.path()
+        if problem.goal_test(node.state):
+            return node.path
         
-        explored.add(node.state())
+        explored.add(node.state)
         
-        for child in node.expand(problem):
-            if child.state() not in explored and child not in frontier.items:
+        for child in problem.expand(node):
+            if child.state not in explored and child.state not in frontier_states.items:
                 frontier.enqueue(child)
+                frontier_states.enqueue(child.state)
                 
     return []
 
@@ -39,10 +43,10 @@ def dfs(problem):
         if problem.goal_test(node):
             return node.path()
         
-        explored.add(node.state())
+        explored.add(node.state)
         
-        for child in node.expand(problem):
-            if child.state() not in explored and child not in frontier.items:
+        for child in problem.expand(node):
+            if child.state not in explored and child not in frontier.items:
                 frontier.push(child)
                 
     return []
@@ -62,10 +66,10 @@ def ucs(problem):
         if problem.goal_test(node):
             return node.path()
         
-        explored.add(node.state())
+        explored.add(node.state)
         
-        for child in node.expand(problem):
-            if child.state() not in explored and child not in frontier.items:
+        for child in problem.expand(node):
+            if child.state not in explored and child not in frontier.items:
                 frontier.push(child, child.path_cost())
             elif child in frontier.items:
                 current_priority = frontier.items[frontier.items.index(child)][0]
@@ -223,8 +227,6 @@ However, it can still be effective in practice and can help guide the search tow
 # Here is an implementation of the astar function in searchAgents.py that takes a SingleFoodSearchProblem object and a heuristic function as input,
 # and returns a list of actions for Pacman to reach the food location:
 
-from fringes import PriorityQueue
-
 def astar(problem, fn_heuristic):
     # Initialize the start node with the initial state
     start_node = Node(problem.get_initial_state())
@@ -311,7 +313,7 @@ and the problem object has to implement the same methods as SingleFoodSearchProb
 # YC2-5:
 def gbfs(problem, fn_heuristic):
     """Perform greedy best-first search on the given problem using the given heuristic."""
-    frontier = util.PriorityQueue()  # Use a priority queue to keep track of the next states to visit
+    frontier = PriorityQueue()  # Use a priority queue to keep track of the next states to visit
     visited = set()  # Use a set to keep track of visited states
     start_state = problem.getStartState()
     frontier.push((start_state, []), fn_heuristic(start_state))  # Add the start state to the frontier with its heuristic value as the priority
